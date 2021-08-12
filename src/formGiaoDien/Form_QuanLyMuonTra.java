@@ -483,40 +483,40 @@ public class Form_QuanLyMuonTra extends javax.swing.JFrame {
         Loan loan = new Loan();
         loan.setMaThanhVien(maTV);
         loan.setMaSach(maSach);
-        
+
         Pattern pattern = Pattern.compile("^[0-9]{4}[-][0-9]{2}[-][0-9]{2}$"); // "\\d{4}[-]\\d{1,2}[-]\\d{1,2}"
         Matcher matcher = pattern.matcher(ngayMuon);
         Matcher matcher1 = pattern.matcher(ngayTra);
-        if(!matcher.find()){
+        if (!matcher.find()) {
             JOptionPane.showMessageDialog(null, "Ngày mượn sai định dạng yyyy-MM-dd");
             tfNgayMuon.setText("");
             tfNgayMuon.requestFocus();
-        }
-        else if(!matcher1.find()){
+        } else if (!matcher1.find()) {
             JOptionPane.showMessageDialog(null, "Ngày trả sai định dạng yyyy-MM-dd");
             tfNgayTra.setText("");
             tfNgayTra.requestFocus();
+        } else {
+            DateFormat dfYMD = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                Date day1 = dfYMD.parse(ngayMuon);
+                loan.setNgayMuon(day1);
+            } catch (ParseException ex) {
+                Logger.getLogger(Form_QuanLyMuonTra.class.getName()).log(Level.SEVERE, null, ex);
+
+                tfNgayMuon.requestFocus();
+            }
+            try {
+                Date day2 = dfYMD.parse(ngayTra);
+                loan.setNgayTra(day2);
+            } catch (ParseException ex) {
+                Logger.getLogger(Form_QuanLyMuonTra.class.getName()).log(Level.SEVERE, null, ex);
+
+                tfNgayTra.requestFocus();
+            }
+            Loan.create(loan);
+            showAll();
         }
-        
-        DateFormat dfYMD = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date day1 = dfYMD.parse(ngayMuon);
-            loan.setNgayMuon(day1);
-        } catch (ParseException ex) {
-            Logger.getLogger(Form_QuanLyMuonTra.class.getName()).log(Level.SEVERE, null, ex);
-            
-            tfNgayMuon.requestFocus();
-        }
-        try {
-            Date day2 = dfYMD.parse(ngayTra);
-            loan.setNgayTra(day2);
-        } catch (ParseException ex) {
-            Logger.getLogger(Form_QuanLyMuonTra.class.getName()).log(Level.SEVERE, null, ex);
-            
-            tfNgayTra.requestFocus();
-        }
-        Loan.create(loan);
-        showAll();
+
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -525,16 +525,16 @@ public class Form_QuanLyMuonTra extends javax.swing.JFrame {
         String maTV = tfMaTV.getText();
         String ngayMuon = tfNgayMuon.getText();
         String ngayTra = tfNgayTra.getText();
-        
-        if(ms.isEmpty() || maTV.isEmpty() || ngayMuon.isEmpty() || ngayTra.isEmpty()){
+
+        if (ms.isEmpty() || maTV.isEmpty() || ngayMuon.isEmpty() || ngayTra.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Nhập đầy đủ TT trước khi LƯU", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
         String idThanhVien = tfMaTV.getText();
         loanList = Loan.searchByBorrowerID(idThanhVien);
         int cnt = 0, cnt1 = 0;
-      
+
         if (loanList.isEmpty()) {
             int i = JOptionPane.showConfirmDialog(this, "Lưu thông tin?", "Question?", JOptionPane.YES_NO_OPTION);
             if (i == JOptionPane.YES_OPTION) {
