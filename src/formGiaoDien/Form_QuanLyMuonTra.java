@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.table.DefaultTableModel;
 import model.Book;
 import model.Borrower;
@@ -471,23 +473,38 @@ public class Form_QuanLyMuonTra extends javax.swing.JFrame {
         String maSach = tfMaSach.getText();
         String ngayMuon = tfNgayMuon.getText();
         String ngayTra = tfNgayTra.getText();
-        if (ngayMuon == null) {
+        if (ngayMuon.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Ngày mượn đang trống", "Error", JOptionPane.ERROR_MESSAGE);
             tfNgayMuon.requestFocus();
-        } else if (ngayTra == null) {
+        } else if (ngayTra.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Ngày trả đang trống", "Error", JOptionPane.ERROR_MESSAGE);
             tfNgayTra.requestFocus();
         }
         Loan loan = new Loan();
         loan.setMaThanhVien(maTV);
         loan.setMaSach(maSach);
+        
+        Pattern pattern = Pattern.compile("^[0-9]{4}[-][0-9]{2}[-][0-9]{2}$"); // "\\d{4}[-]\\d{1,2}[-]\\d{1,2}"
+        Matcher matcher = pattern.matcher(ngayMuon);
+        Matcher matcher1 = pattern.matcher(ngayTra);
+        if(!matcher.find()){
+            JOptionPane.showMessageDialog(null, "Ngày mượn sai định dạng yyyy-MM-dd");
+            tfNgayMuon.setText("");
+            tfNgayMuon.requestFocus();
+        }
+        else if(!matcher1.find()){
+            JOptionPane.showMessageDialog(null, "Ngày trả sai định dạng yyyy-MM-dd");
+            tfNgayTra.setText("");
+            tfNgayTra.requestFocus();
+        }
+        
         DateFormat dfYMD = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date day1 = dfYMD.parse(ngayMuon);
             loan.setNgayMuon(day1);
         } catch (ParseException ex) {
             Logger.getLogger(Form_QuanLyMuonTra.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, "Ngày mượn sai định dạng yyyy-MM-dd");
+            
             tfNgayMuon.requestFocus();
         }
         try {
@@ -495,7 +512,7 @@ public class Form_QuanLyMuonTra extends javax.swing.JFrame {
             loan.setNgayTra(day2);
         } catch (ParseException ex) {
             Logger.getLogger(Form_QuanLyMuonTra.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, "Ngày trả sai định dạng yyyy-MM-dd");
+            
             tfNgayTra.requestFocus();
         }
         Loan.create(loan);
